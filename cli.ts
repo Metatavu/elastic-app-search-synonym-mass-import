@@ -9,23 +9,25 @@ import { SynonymSet } from "./elastic/types.ts";
 const log = ink.terminal.log;
 const error = ink.terminal.error;
 
-await new Command()
-  .name("Elastic App Search synonym mass importer")
+if (import.meta.main) {
+  await new Command()
+  .name("elastic-app-search-synonym-mass-import")
   .version("0.0.1")
   .description(`
     Command line tool for importing synonyms.
-      - import list of synonyms from XLSX file
-      - previews the list of synonyms found (can be fast-forwarded with -y)
-      - (possibly deletes existing synonyms from Elastic App Search)
-      - then creates them to Elastic App Search as new Synonyms
+
+    - imports list of synonym sets from XLSX file in given path
+    - Previews the list of synonym sets found from file
+    - If --delete-existing is in effect, deletes existing synonym sets from Elastic App Search
+    - Creates previewed synonym sets to Elastic App Search
   `)
 
-  .env("ELASTIC_URL=<value:string>", "URL address to Elastic App Search", { required: true })
-  .env("ELASTIC_APP_ENGINE=<value:string>", "Elastic App Engine name", { required: true })
-  .env("ELASTIC_PRIVATE_API_KEY=<value:string>", "Elastic App Search private API key", { required: true })
+  .env("ELASTIC_URL=<url:string>", "URL address to Elastic App Search", { required: true })
+  .env("ELASTIC_APP_ENGINE=<name:string>", "Elastic App Engine name", { required: true })
+  .env("ELASTIC_PRIVATE_API_KEY=<key:string>", "Elastic App Search private API key", { required: true })
 
-  .option("-d, --delete-existing", "Delete existing synonyms from Elastic App Search")
-  .arguments("<input:file>")
+  .option("-d, --delete-existing", "Delete existing synonym sets from Elastic App Search")
+  .arguments("</path/to/xlsx_file:file>")
 
   .action(async (options, ...[ path ]) => {
     const env = getEnvFromOptions(options);
@@ -113,3 +115,4 @@ await new Command()
   })
 
   .parse(Deno.args);
+}
